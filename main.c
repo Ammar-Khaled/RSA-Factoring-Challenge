@@ -1,6 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <stddef.h>
 #include <math.h>
+
+#define llu long long unsigned
+#define ld long double
 
 /**
  * main - Factorizes as many numbers as possible into
@@ -13,53 +18,55 @@
  */
 int main(int argc, char *argv[])
 {
-	FILE *file_ptr;
-	char *line;
-	long long number;
+    FILE *file_ptr;
+    char *line_buf;
+    size_t buf_size = 1024;
+    ld number, i;
+    ssize_t n_read;
 
-	if (argc != 2)
-	{
-		fprintf(stderr, "Usage: factors <file>\n");
-		exit(EXIT_FAILURE);
-	}
+    if (argc != 2)
+    {
+        fprintf(stderr, "Usage: factors <file>\n");
+        exit(EXIT_FAILURE);
+    }
 
-	file_ptr = fopen(argv[1], "r");
-	if (!file_ptr)
-	{
-		fprintf(stderr, "Can't open file %s\n", argv[1]);
-		exit(EXIT_FAILURE);
-	}
+    file_ptr = fopen(argv[1], "r");
+    if (!file_ptr)
+    {
+        fprintf(stderr, "Can't open file %s\n", argv[1]);
+        exit(EXIT_FAILURE);
+    }
 
-	line = malloc(1024 * sizeof(char));
-	if (!line)
-	{
-		fprintf(stderr, "Allocation erroe\n");
-		exit(EXIT_FAILURE);
-	}
+    line_buf = malloc(1024 * sizeof(char));
+    if (!line_buf)
+    {
+        fprintf(stderr, "Allocation erroe\n");
+        exit(EXIT_FAILURE);
+    }
 
-	line = fgets(line, 1025, file_ptr);
-	while (line)
-	{
-		number = atoll(line);
-		if (number % 2 == 0)
-		{
-			printf("%lli=%i*%lli\n", number, 2, number / 2);
-		}
-		else
-		{
-			for (long long i = 3; i < number; i++)
-			{
-				if (number % i == 0)
-				{
-					printf("%lli=%lli*%lli\n", number, i, number / i);
-				}
-			}
-		}
+    n_read = getline(&line_buf, &buf_size, file_ptr);
+    while (n_read != -1)
+    {
+        number = strtold(line_buf, NULL);
+        if ((llu) number % 2 == 0)
+        {
+            printf("%.0Lf=%llu*%i\n", number, (llu)(number / 2), 2);
+        }
+        else
+        {
+            for (i = 3; i < number; i+=2)
+            {
+                if ((llu)number % (llu) i == 0)
+                {
+                    printf("%.0Lf=%llu*%.0Lf\n", number, (llu)(number / i), i);
+                    break;
+                }
+            }
+        }
+        n_read = getline(&line_buf, &buf_size, file_ptr);
+    }
 
-		line = fgets(line, 1025, file_ptr);
-	}
-
-	free(line);
-	fclose(file_ptr);
-	return (0);
+    free(line_buf);
+    fclose(file_ptr);
+    return (0);
 }
