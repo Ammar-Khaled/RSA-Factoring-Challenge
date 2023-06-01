@@ -3,9 +3,16 @@
 #include <unistd.h>
 #include <stddef.h>
 #include <math.h>
+#include <string.h>
 
 #define llu long long unsigned
 #define ld long double
+
+
+int is_whole(ld num)
+{
+    return num - floorl(num) == 0;
+}
 
 /**
  * main - Factorizes as many numbers as possible into
@@ -48,17 +55,17 @@ int main(int argc, char *argv[])
     while (n_read != -1)
     {
         number = strtold(line_buf, NULL);
-        if ((llu) number % 2 == 0)
+        if (is_whole(number / 2))
         {
-            printf("%.0Lf=%llu*%i\n", number, (llu)(number / 2), 2);
+            printf("%.0Lf=%.0Lf*%i\n", number, floorl(number / 2), 2);
         }
         else
         {
-            for (i = 3; i < number; i+=2)
+            for (i = 3; i < sqrtl(number); i+=2)
             {
-                if ((llu)number % (llu) i == 0)
+                if (is_whole(number / i))
                 {
-                    printf("%.0Lf=%llu*%.0Lf\n", number, (llu)(number / i), i);
+                    printf("%.0Lf=%.0Lf*%.0Lf\n", number, floorl(number / i), i);
                     break;
                 }
             }
