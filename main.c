@@ -8,10 +8,71 @@
 #define llu long long unsigned
 #define ld long double
 
-
 int is_whole(ld num)
 {
     return num - floorl(num) == 0;
+}
+
+
+void normal_factoring(ld number)
+{
+    if (is_whole(number / 2))
+    {
+        printf("%.0Lf=%.0Lf*%i\n", number, floorl(number / 2), 2);
+    }
+    else
+    {
+        for (ld i = 3; i < sqrtl(number); i += 2)
+        {
+            if (is_whole(number / i))
+            {
+                printf("%.0Lf=%.0Lf*%.0Lf\n", number, floorl(number / i), i);
+                break;
+            }
+        }
+    }
+}
+
+int is_prime(ld number)
+{
+    if (number == 2)
+    {
+        return 1;
+    }
+
+    if (is_whole(number / 2))
+    {
+        return 0;
+    }
+
+    for (ld i = 3; i < sqrtl(number); i+=2)
+    {
+        if (is_whole(number / i))
+        {
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
+void prime_factoring(ld number)
+{
+    if (is_whole(number / 2) && is_prime(number / 2))
+    {
+        printf("%.0Lf=%.0Lf*%i\n", number, floorl(number / 2), 2);
+    }
+    else
+    {
+        for (ld i = 3; i < sqrtl(number); i += 2)
+        {
+            if (is_whole(number / i) && is_prime(i) && is_prime(number / i))
+            {
+                printf("%.0Lf=%.0Lf*%.0Lf\n", number, floorl(number / i), i);
+                break;
+            }
+        }
+    }
 }
 
 /**
@@ -28,7 +89,7 @@ int main(int argc, char *argv[])
     FILE *file_ptr;
     char *line_buf;
     size_t buf_size = 1024;
-    ld number, i;
+    ld number;
     ssize_t n_read;
 
     if (argc != 2)
@@ -55,21 +116,7 @@ int main(int argc, char *argv[])
     while (n_read != -1)
     {
         number = strtold(line_buf, NULL);
-        if (is_whole(number / 2))
-        {
-            printf("%.0Lf=%.0Lf*%i\n", number, floorl(number / 2), 2);
-        }
-        else
-        {
-            for (i = 3; i < sqrtl(number); i+=2)
-            {
-                if (is_whole(number / i))
-                {
-                    printf("%.0Lf=%.0Lf*%.0Lf\n", number, floorl(number / i), i);
-                    break;
-                }
-            }
-        }
+        prime_factoring(number);
         n_read = getline(&line_buf, &buf_size, file_ptr);
     }
 
